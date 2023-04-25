@@ -49,9 +49,47 @@ class ModelTrainer:
                 "AdaBoost" : AdaBoostRegressor()
             }
             
+            params={
+                "Linear Regression":{},
+                "Random Forest":{
+                    # 'criterion':['squared_error', 'friedman_mse', 'absolute_error', 'poisson'],
+                 
+                    # 'max_features':['sqrt','log2',None],
+                    'n_estimators': [8,16,32,64,128,256]
+                },
+                "Decision Tree": {
+                    'criterion':['squared_error', 'friedman_mse', 'absolute_error', 'poisson'],
+                    # 'splitter':['best','random'],
+                    # 'max_features':['sqrt','log2'],
+                },
+                "Gradient Boosting":{
+                    # 'loss':['squared_error', 'huber', 'absolute_error', 'quantile'],
+                    'learning_rate':[.1,.01,.05,.001],
+                    'subsample':[0.6,0.7,0.75,0.8,0.85,0.9],
+                    # 'criterion':['squared_error', 'friedman_mse'],
+                    # 'max_features':['auto','sqrt','log2'],
+                    'n_estimators': [8,16,32,64,128,256]
+                },
+                "K-Neighbors Classifier" : {},
+                "XGBoost":{
+                    'learning_rate':[.1,.01,.05,.001],
+                    'n_estimators': [8,16,32,64,128,256]
+                },
+                "CatBoost":{
+                    'depth': [6,8,10],
+                    'learning_rate': [0.01, 0.05, 0.1],
+                    'iterations': [30, 50, 100]
+                },
+                "AdaBoost":{
+                    'learning_rate':[.1,.01,0.5,.001],
+                    # 'loss':['linear','square','exponential'],
+                    'n_estimators': [8,16,32,64,128,256]
+                }
+            }
+
             model_report : dict = evaluate_model(
                 x_train=x_train, y_train=y_train, x_test=x_test,
-                y_test=y_test, models=models
+                y_test=y_test, models=models, params=params
             )
             
             ## To get best model score from dict
@@ -68,6 +106,7 @@ class ModelTrainer:
                 raise CustomException("No best model found")
             
             logging.info(f"Best found model on both training & testing dataset")
+            logging.info(f"Best model name is {best_model_name}")
 
             save_object(
                 file_path=self.model_trainer_config.trained_model_file_path,
@@ -78,6 +117,6 @@ class ModelTrainer:
             r2_square = r2_score(y_test, predicted)
             
             return r2_square
-            
+
         except Exception as e:
             raise CustomException(e, sys)
